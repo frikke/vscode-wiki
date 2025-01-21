@@ -5,47 +5,59 @@ After cloning and building the repo, check out the [issues list](https://github.
 
 ## Prerequisites
 
-In order to download necessary tools, clone the repository, and install dependencies via `yarn`, you need network access.
+In order to download necessary tools, clone the repository, and install dependencies via `npm`, you need network access.
 
 You'll need the following tools:
 
 - [Git](https://git-scm.com)
-- [Node.JS](https://nodejs.org/en/), **x64**, version `>=16.14.x and <17`
-- [Yarn 1](https://classic.yarnpkg.com/en/), version `>=1.10.1 and <2`, follow the [installation guide](https://classic.yarnpkg.com/en/docs/install)
+- [Node.JS](https://nodejs.org/en/download/prebuilt-binaries), **x64** or **ARM64**, version `>=20.x`
+  - Windows: do not pick the option to install Windows Build Tools, see the step below for instructions
 - [Python](https://www.python.org/downloads/) (required for node-gyp; check the [node-gyp readme](https://github.com/nodejs/node-gyp#installation) for the currently supported Python versions)
-  - **Note:** Python will be automatically installed for Windows users through installing `windows-build-tools` npm module (see below)
+  - **Note:** make sure `python` can run from a command line prompt without error
 - A C/C++ compiler tool chain for your platform:
-  - **Windows 10/11**
-    - Install the Windows Build Tools:
-      - if you install Node on your system using the Node installer from the [Node.JS](https://nodejs.org/en/download/) page then ensure that you have installed the 'Tools for Native Modules'. Everything should work out of the box then.
-      - if you use a node version manager like [nvm](https://github.com/coreybutler/nvm-windows) or [nvs](https://github.com/jasongin/nvs) then follow these steps:
-        - Install the current version of Python using the [Microsoft Store Package](https://docs.python.org/3/using/windows.html#the-microsoft-store-package).
-        - Install the Visual C++ Build Environment by either installing the [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools) or the [Visual Studio Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community). The minimum workload to install is 'Desktop Development with C++'.
-        - open a command prompt and run `npm config set msvs_version {visual studio version}`. (If you are using Visual Studio 2019 then you need to run `npm config set msvs_version 2019`)
+  - **Windows 10/11 (x64 or ARM64)**
+    - Install the Visual C++ Build Environment by either installing the [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools) or the [Visual Studio Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community). The minimum workload to install is `Desktop Development with C++`. But there are additional components from "Individual components":
+      - `MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)` (use `ARM64` for Windows on ARM, but the x64/x86 may still be needed)
+      - `C++ ATL for latest build tools with Spectre Mitigations`
+      - `C++ MFC for latest build tools with Spectre Mitigations`
+      - note: for Windows on ARM, you may need to specify the version, e.g. v14.41-17.11, rather than (latest), but pick a version that is not out of support.
+          - also the `MSVC v143 - VS 2022 C++ build tools`.
+    - open a command prompt and run `npm config edit` and add or modify the `msvs_version` setting equal to your vs version. (e.g. `msvs_version=2022` for visual studio 2022)
     - **Warning:** Make sure your profile path only contains ASCII letters, e.g. *John*, otherwise, it can lead to [node-gyp usage problems (nodejs/node-gyp/issues#297)](https://github.com/nodejs/node-gyp/issues/297)
     - **Note**: Building and debugging via the Windows subsystem for Linux (WSL) is currently not supported.
   - **Windows WSL2**: https://github.com/microsoft/vscode/wiki/Selfhosting-on-Windows-WSL
   - **macOS**
-    - [Xcode](https://developer.apple.com/xcode/downloads/) and the Command Line Tools, which will install `gcc` and the related toolchain containing `make`
+    - [Xcode](https://developer.apple.com/xcode/resources/) and the Command Line Tools, which will install `gcc` and the related toolchain containing `make`
       - Run `xcode-select --install` to install the Command Line Tools
   - **Linux**
-    * On Debian-based Linux: `sudo apt-get install build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev python-is-python3`
-    * On Red Hat-based Linux: `sudo yum groupinstall "Development Tools" && sudo yum install libX11-devel.x86_64 libxkbfile-devel.x86_64 libsecret-devel # or .i686`.
+    * On Debian-based Linux: `sudo apt-get install build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev python-is-python3`
+    * On Red Hat-based Linux: `sudo yum groupinstall "Development Tools" && sudo yum install libX11-devel.x86_64 libxkbfile-devel.x86_64 libsecret-devel krb5-devel # or .i686`.
     * Others:
       * `make`
       * [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
       * [GCC](https://gcc.gnu.org) or another compile toolchain
-      * Dependencies:
     * Building deb and rpm packages requires `fakeroot` and `rpm`; run: `sudo apt-get install fakeroot rpm`
 
 ### Troubleshooting
-In case of issues, try deleting the contents of `~/.node-gyp` (alternatively `~/.cache/node-gyp` for Linux, `~/Library/Caches/node-gyp/` for macOS, or `%USERPROFILE%\AppData\Local\node-gyp` for Windows) first and then run `yarn cache clean` and then try again.
+In case of issues, try deleting the contents of `~/.node-gyp` (alternatively `~/.cache/node-gyp` for Linux, `~/Library/Caches/node-gyp/` for macOS, or `%USERPROFILE%\AppData\Local\node-gyp` for Windows) first and then run `git clean -xfd` and then try again.
 
-> If you are on Windows or Linux 64 bit systems and would like to compile to 32 bit, you'll need to set the `npm_config_arch` environment variable to `ia32` before running `yarn`. This will compile all native node modules for a 32 bit architecture. Similarly, when cross-compiling for ARM, set `npm_config_arch` to `arm`.
+> If you are on Windows or Linux 64 bit systems and would like to compile to 32 bit, you'll need to set the `npm_config_arch` environment variable to `ia32` before running `npm`. This will compile all native node modules for a 32 bit architecture. Similarly, when cross-compiling for ARM, set `npm_config_arch` to `arm`.
 
 > **Note:** For more information on how to install NPM modules globally on UNIX systems without resorting to `sudo`, refer to [this guide](http://www.johnpapa.net/how-to-use-npm-global-without-sudo-on-osx/).
 
 > If you have Visual Studio 2019 installed, you may face issues when using the default version of node-gyp. If you have Visual Studio 2019 installed, you may need to follow the solutions [here](https://github.com/nodejs/node-gyp/issues/1747).
+
+#### Missing spectre mitigated libraries on Windows
+
+If you are using npm >= 10.2.3 or node-gyp >= 10.0.0, then you might see error when building native modules of this project
+
+> Spectre-mitigated libraries are required for this project.
+
+To fix this error open Visual Studio Installer, add the following components corresponding to the architecture you are building for (x64/ARM/ARM64) and restart your build session
+
+- MSVC Spectre-mitigated libs (latest)
+- C++ ATL for latest build tools with Spectre Mitigations
+- C++ MFC for latest build tools with Spectre Mitigations
 
 ### Development container
 
@@ -92,17 +104,17 @@ Manage any merge conflicts, commit them, and then push them to your fork.
 
 ### Build
 
-Install and build all of the dependencies using `Yarn`:
+Install and build all of the dependencies using `npm`:
 
 ```
 cd vscode
-yarn
+npm install
 ```
 
 Then you have two options:
 
 - If you want to build from inside VS Code, you can open the `vscode` folder and start the build task with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> on macOS). The build task will stay running in the background even if you close VS Code. If you happen to close VS Code and open it again, just resume the build by pressing <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>) again. You can kill it by running the `Kill Build VS Code` task or pressing <kbd>Ctrl</kbd>+<kbd>D</kbd> in the task terminal.
-- If you want to build from a terminal, run `yarn watch`. This will run both the core watch task and watch-extension tasks in a single terminal.
+- If you want to build from a terminal, run `npm run watch`. This will run both the core watch task and watch-extension tasks in a single terminal.
 
 The incremental builder will do an initial full build and will display a message that includes the phrase "Finished compilation" once the initial build is complete. The builder will watch for file changes and compile those changes incrementally, giving you a fast, iterative coding experience.
 
@@ -111,7 +123,7 @@ The incremental builder will do an initial full build and will display a message
 - **Windows:** If you have installed Visual Studio 2017 as your build tool, you need to open **x64 Native Tools Command Prompt for VS 2017**. Do not confuse it with *VS2015 x64 Native Tools Command Prompt*, if installed.
 - **Linux:** You may hit a ENOSPC error when running the build. To get around this follow instructions in the [Common Questions](https://code.visualstudio.com/docs/setup/linux#_common-questions).
 
-If the build step fails, or if the built version fails to run (see next section), run `git clean -xfd` in your `vscode` folder, then re-run `yarn`.
+If the build step fails, or if the built version fails to run (see next section), run `git clean -xfd` in your `vscode` folder, then re-run `npm install`.
 
 #### Errors and Warnings
 Errors and warnings will show in the console while developing VS Code. If you use VS Code to develop VS Code, errors and warnings are shown in the status bar at the bottom left of the editor. You can view the error list using `View | Errors and Warnings` or pressing <kbd>Ctrl</kbd>+<kbd>P</kbd> and then <kbd>!</kbd> (<kbd>CMD</kbd>+<kbd>P</kbd> and <kbd>!</kbd> on macOS).
@@ -122,54 +134,56 @@ Errors and warnings will show in the console while developing VS Code. If you us
 
 To test the changes, you launch a development version of VS Code on the workspace `vscode`, which you are currently editing.
 
-### Desktop
+To test changes with a remote, use the "TestResolver" in your Code - OSS window which creates a fake remote window. Search Command Palette for `TestResolver`. More information is at https://github.com/microsoft/vscode/issues/162874#issuecomment-1271774905.
+
+#### Desktop
 
 Running on Electron with extensions run in NodeJS:
 
-**macOS and Linux**
+##### macOS and Linux
 
 ```bash
 ./scripts/code.sh
 ./scripts/code-cli.sh # for running CLI commands (eg --version)
 ```
 
-**Windows**
+##### Windows
 
 ```bat
 .\scripts\code.bat
 .\scripts\code-cli.bat
 ```
 
-👉 **Tip!** If you receive an error stating that the app is not a valid Electron app, it probably means you didn't run `yarn watch` first.
+👉 **Tip!** If you receive an error stating that the app is not a valid Electron app, it probably means you didn't run `npm run watch` first.
 
-### VS Code for the Web
+#### VS Code for the Web
 
 Extensions and UI run in the browser.
 
-👉 Besides `yarn watch` also run `yarn watch-web` to build the web bits for the built-in extensions.
+👉 Besides `npm run watch` also run `npm run watch-web` to build the web bits for the built-in extensions.
 
-**macOS and Linux**
+##### macOS and Linux
 
 ```bash
 ./scripts/code-web.sh
 ```
 
-**Windows**
+##### Windows
 
 ```bat
 .\scripts\code-web.bat
 ```
-### Code Server Web
+#### Code Server Web
 
 UI in the browser, extensions run in code server (NodeJS):
 
-**macOS and Linux**
+##### macOS and Linux
 
 ```bash
 ./scripts/code-server.sh --launch
 ```
 
-**Windows**
+##### Windows
 
 ```bat
 .\scripts\code-server.bat --launch
@@ -187,7 +201,7 @@ The **render** process runs the UI code inside the Shell window. To debug code r
 
 #### Using VS Code
 * Open the `vscode` repository folder
-* Choose the `Launch VS Code` launch configuration from the launch dropdown in the Debug viewlet and press <kbd>F5</kbd>.
+* Choose the `VS Code` launch configuration from the launch dropdown in the Debug viewlet and press <kbd>F5</kbd>.
 
 
 #### Using the Chrome Developer Tools
@@ -210,7 +224,7 @@ We also have automated UI tests. The [smoke test README](https://github.com/Micr
 Run the tests directly from a terminal by running `./scripts/test.sh` from the `vscode` folder (`scripts\test` on Windows). The [test README](https://github.com/Microsoft/vscode/blob/main/test/README.md) has complete details on how to run and debug tests, as well as how to produce coverage reports.
 
 ### Linting
-We use [eslint](https://eslint.org/) for linting our sources. You can run eslint across the sources by calling `yarn eslint` from a terminal or command prompt. You can also run `yarn eslint` as a VS Code task by pressing <kbd>Ctrl</kbd>+<kbd>P</kbd> (<kbd>CMD</kbd>+<kbd>P</kbd> on macOS) and entering `task eslint`.
+We use [eslint](https://eslint.org/) for linting our sources. You can run eslint across the sources by calling `npm run eslint` from a terminal or command prompt. You can also run `npm run eslint` as a VS Code task by pressing <kbd>Ctrl</kbd>+<kbd>P</kbd> (<kbd>CMD</kbd>+<kbd>P</kbd> on macOS) and entering `task eslint`.
 
 To lint the source as you make changes you can install the [eslint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
 
@@ -254,7 +268,7 @@ These `gulp` tasks are available:
 * `vscode-[platform]`: Builds a packaged version for `[platform]`.
 * `vscode-[platform]-min`: Builds a packaged and minified version for `[platform]`.
 
-👉 **Tip!** Run `gulp` via `yarn` to avoid potential out of memory issues, for example `yarn gulp vscode-linux-x64`
+👉 **Tip!** Run `gulp` via `npm` to avoid potential out of memory issues, for example `npm run gulp vscode-linux-x64`
 
 See also: [Cross-Compiling for Debian-based Linux](https://github.com/Microsoft/vscode/wiki/Cross-Compiling-for-Debian-Based-Linux)
 
